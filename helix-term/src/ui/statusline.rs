@@ -155,6 +155,9 @@ where
         helix_view::editor::StatusLineElement::Separator => render_separator,
         helix_view::editor::StatusLineElement::Spacer => render_spacer,
         helix_view::editor::StatusLineElement::VersionControl => render_version_control,
+        helix_view::editor::StatusLineElement::VersionControlChanges => {
+            render_version_control_changes
+        }
         helix_view::editor::StatusLineElement::Register => render_register,
         helix_view::editor::StatusLineElement::CurrentWorkingDirectory => render_cwd,
     }
@@ -543,6 +546,44 @@ where
         .to_string();
 
     write(context, head.into());
+}
+
+fn render_version_control_changes<'a, F>(context: &mut RenderContext<'a>, write: F)
+where
+    F: Fn(&mut RenderContext<'a>, Span<'a>) + Copy,
+{
+    let Some(diff_handle) = context.doc.diff_handle() else {
+        return;
+    };
+
+    let diff = diff_handle.load();
+    let hunks = diff.hunks();
+
+    let mut added = 0;
+    let mut removed = 0;
+    for hunk in hunks {
+        added += hunk.after.len();
+        removed += hunk.before.len();
+    }
+
+    if added > 0 {
+        write(
+            context,
+            Span::styled(format!("+{added}"), context.editor.theme.get("diff.plus")),
+        );
+        write(context, " ".into());
+    }
+
+    if removed > 0 {
+        write(
+            context,
+            Span::styled(
+                format!("-{removed}"),
+                context.editor.theme.get("diff.minus"),
+            ),
+        );
+        write(context, " ".into());
+    }
 }
 
 fn render_register<'a, F>(context: &mut RenderContext<'a>, write: F)

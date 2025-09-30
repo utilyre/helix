@@ -132,6 +132,10 @@ pub struct Diff<'a> {
 }
 
 impl Diff<'_> {
+    pub fn hunks(&self) -> &Vec<Hunk> {
+        &self.diff.hunks
+    }
+
     /// Returns the base [Rope] of the [Diff]
     pub fn diff_base(&self) -> &Rope {
         if self.inverted {
