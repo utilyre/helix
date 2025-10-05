@@ -683,6 +683,7 @@ pub enum StatusLineElement {
     /// Current version control information
     VersionControl,
 
+    /// A summary of the number of added/modified/removed lines on file
     VersionControlChanges,
 
     /// Indicator for selected register
