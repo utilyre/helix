@@ -132,6 +132,7 @@ pub struct Diff<'a> {
 }
 
 impl Diff<'_> {
+    /// Returns the diff [Hunk]s
     pub fn hunks(&self) -> &[Hunk] {
         &self.diff.hunks
     }
