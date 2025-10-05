@@ -559,26 +559,48 @@ where
     let diff = diff_handle.load();
     let hunks = diff.hunks();
 
-    let mut added = 0;
-    let mut removed = 0;
+    let mut total_added = 0;
+    let mut total_modified = 0;
+    let mut total_removed = 0;
     for hunk in hunks {
-        added += hunk.after.len();
-        removed += hunk.before.len();
+        let mut added = hunk.after.len();
+        let mut removed = hunk.before.len();
+        let modified = added.min(removed);
+        added -= modified;
+        removed -= modified;
+
+        total_added += added;
+        total_modified += modified;
+        total_removed += removed;
     }
 
-    if added > 0 {
+    if total_added > 0 {
         write(
             context,
-            Span::styled(format!("+{added}"), context.editor.theme.get("diff.plus")),
+            Span::styled(
+                format!("+{total_added}"),
+                context.editor.theme.get("diff.plus"),
+            ),
         );
         write(context, " ".into());
     }
 
-    if removed > 0 {
+    if total_modified > 0 {
         write(
             context,
             Span::styled(
-                format!("-{removed}"),
+                format!("~{total_modified}"),
+                context.editor.theme.get("diff.delta"),
+            ),
+        );
+        write(context, " ".into());
+    }
+
+    if total_removed > 0 {
+        write(
+            context,
+            Span::styled(
+                format!("-{total_removed}"),
                 context.editor.theme.get("diff.minus"),
             ),
         );
