@@ -132,7 +132,7 @@ pub struct Diff<'a> {
 }
 
 impl Diff<'_> {
-    pub fn hunks(&self) -> &Vec<Hunk> {
+    pub fn hunks(&self) -> &[Hunk] {
         &self.diff.hunks
     }
 
